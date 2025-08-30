@@ -1557,29 +1557,22 @@ nextBtn.textContent = '次の質問';
 
 }
 
-}
-
-
 function selectAnswer(answerIndex) {
+  const buttons = document.querySelectorAll('.answer-btn');
+  const answerValue = parseInt(buttons[answerIndex].dataset.value);
 
-const buttons = document.querySelectorAll('.answer-btn');
+  answers[currentQuestion] = {
+    index: answerIndex,
+    value: answerValue
+  };
 
-buttons.forEach(btn => btn.classList.remove('selected'));
-
-buttons[answerIndex].classList.add('selected');
-
-const answerValue = parseInt(buttons[answerIndex].dataset.value);
-
-answers[currentQuestion] = {
-
-index: answerIndex,
-
-value: answerValue
-
-};
-
-document.getElementById('next-btn').disabled = false;
-
+  // 今の質問に回答したら即次へ
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    showQuestion();
+  } else {
+    showResult();
+  }
 }
 
 
