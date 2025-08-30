@@ -3,90 +3,114 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>AI副業 診断テスト（短文版）</title>
+<title>AI副業 診断テスト（ライト＆ポップ版）</title>
 <style>
   :root{
-    --bg:#0f172a;        /* slate-900 */
-    --panel:#111827;     /* gray-900 */
-    --card:#0b1220;      /* custom dark */
-    --text:#e5e7eb;      /* gray-200 */
-    --muted:#9ca3af;     /* gray-400 */
-    --accent:#60a5fa;    /* blue-400 */
-    --accent-2:#2563eb;  /* blue-600 */
-    --ok:#22c55e;        /* green-500 */
-    --warn:#f59e0b;      /* amber-500 */
-    --bad:#ef4444;       /* red-500 */
+    /* --- Light & Pop Palette (元の淡いブルー系に寄せる) --- */
+    --bg:#f5f9ff;                 /* 明るい背景 */
+    --grad-a:#e6f0f9;             /* 既出の基調色 */
+    --grad-b:#c2dbf0;             /* 既出の基調色 */
+    --panel:#ffffff;              /* カード背景 */
+    --text:#0f172a;               /* 濃いめテキスト */
+    --muted:#475569;              /* サブテキスト */
+    --border:#dbe7f5;             /* 枠線 */
+    --accent:#3b82f6;             /* ブルー */
+    --accent-2:#06b6d4;           /* シアン */
+    --ok:#16a34a;                 /* グリーン */
+    --warn:#f59e0b;               /* アンバー */
+    --bad:#ef4444;                /* レッド */
   }
 
   html,body{height:100%}
   body{
-    margin:0; background: radial-gradient(1200px 600px at 80% -10%, #1e293b 0%, #0b1020 40%, #060b16 100%), var(--bg);
-    color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Noto Sans JP, Roboto, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing:antialiased; line-height:1.5;
-    display:flex; align-items:center; justify-content:center; padding:24px;
+    margin:0; font-family: system-ui,-apple-system,Segoe UI,Noto Sans JP,Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text); background:
+      radial-gradient(900px 500px at 85% -10%, rgba(198,231,255,.65), rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, var(--grad-a), var(--grad-b));
+    -webkit-font-smoothing:antialiased; line-height:1.6;
+    display:flex; align-items:center; justify-content:center; padding:20px;
   }
 
   .app{
-    width:min(880px, 100%); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-    border:1px solid rgba(255,255,255,.06); border-radius:16px; box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    width:min(920px, 100%);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow: 0 12px 40px rgba(43,98,170,.18);
     overflow:hidden;
   }
 
   header{
-    padding:18px 22px; background:linear-gradient(90deg, rgba(37,99,235,.25), rgba(96,165,250,.05));
-    border-bottom:1px solid rgba(255,255,255,.06);
+    padding:18px 22px;
+    background: linear-gradient(90deg, rgba(59,130,246,.18), rgba(6,182,212,.10));
+    border-bottom:1px solid var(--border);
   }
-  header h1{ margin:0; font-size: clamp(18px, 2.2vw, 22px); letter-spacing:.2px;}
-  header p{ margin:4px 0 0; font-size:14px; color:var(--muted)}
+  header h1{ margin:0; font-size: clamp(18px,2.3vw,22px); letter-spacing:.2px;}
+  header p{ margin:6px 0 0; font-size:14px; color:var(--muted)}
 
   .panel{ padding:28px; display:flex; gap:28px; flex-wrap:wrap; align-items:stretch}
-  .intro, .card{ flex:1 1 320px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:22px}
+  .intro, .card{ flex:1 1 320px; background:#fff; border:1px solid var(--border); border-radius:12px; padding:22px}
   .intro h2, .card h2{margin:0 0 8px; font-size: clamp(18px,2vw,20px)}
   .intro p{margin:0; color:var(--muted)}
 
   .start-wrap{ display:flex; flex-direction:column; gap:14px; justify-content:center}
   .btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
     background: linear-gradient(180deg, var(--accent), var(--accent-2)); color:white; border:0;
-    padding:14px 18px; border-radius:10px; font-weight:700; cursor:pointer; letter-spacing:.2px;
-    transition: transform .06s ease, filter .15s ease;
+    padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer; letter-spacing:.2px;
+    transition: transform .06s ease, filter .15s ease, box-shadow .15s ease;
+    box-shadow: 0 4px 14px rgba(59,130,246,.25);
   }
   .btn:hover{ filter:brightness(1.05)}
   .btn:active{ transform:translateY(1px)}
-  .btn.secondary{ background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--text); font-weight:600}
+  .btn.secondary{
+    background: white; color:var(--text);
+    border:1px solid var(--border); box-shadow:none; font-weight:600
+  }
   .btn.block{ width:100% }
 
   /* Question page */
   .q-wrap{ padding:22px}
-  .progress{ height:8px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; margin:8px 0 18px}
-  .bar{ height:100%; width:0%; background:linear-gradient(90deg, #60a5fa, #22c55e)}
+  .progress{ height:10px; background:#ecf4ff; border:1px solid var(--border); border-radius:999px; overflow:hidden; margin:8px 0 18px}
+  .bar{ height:100%; width:0%; background:linear-gradient(90deg, #60a5fa, #34d399)}
   .q-meta{ display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:14px; margin-bottom:8px}
   .q-title{ font-size: clamp(18px,2vw,20px); margin:0 0 12px}
   .answers{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px}
   .answer{
-    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); color:var(--text);
-    padding:14px; border-radius:10px; text-align:left; cursor:pointer; transition: border-color .15s ease, background .15s ease, transform .05s ease;
-    min-height:52px; white-space:normal; word-break:keep-all; line-height:1.4;
+    background:#ffffff; border:1px solid var(--border); color:var(--text);
+    padding:14px; border-radius:10px; text-align:left; cursor:pointer;
+    transition: border-color .15s ease, background .15s ease, transform .05s ease, box-shadow .15s ease;
+    min-height:54px; white-space:normal; word-break:keep-all; line-height:1.4;
   }
-  .answer:hover{ border-color:rgba(96,165,250,.5); background:rgba(37,99,235,.08)}
+  .answer:hover{ border-color:#b9d6ff; box-shadow: 0 3px 10px rgba(59,130,246,.12)}
   .answer:active{ transform: translateY(1px) }
 
   /* Result */
   .result{ padding:26px; display:grid; gap:14px}
   .score{ font-size: clamp(22px, 3vw, 28px); margin:0}
   .badge{
-    display:inline-flex; gap:8px; align-items:center; font-weight:700; padding:8px 12px; border-radius:999px;
-    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:var(--text)
+    display:inline-flex; gap:8px; align-items:center; font-weight:800; padding:8px 12px; border-radius:999px;
+    background:#fff; border:2px solid var(--border); color:var(--text)
   }
-  .good{ box-shadow: inset 0 0 0 1px rgba(34,197,94,.35); background: rgba(34,197,94,.12) }
-  .warn{ box-shadow: inset 0 0 0 1px rgba(245,158,11,.35); background: rgba(245,158,11,.12) }
-  .bad{  box-shadow: inset 0 0 0 1px rgba(239,68,68,.35);  background: rgba(239,68,68,.12) }
+  .good{ border-color: rgba(22,163,74,.35); background: #e8f8ee }
+  .warn{ border-color: rgba(245,158,11,.35); background: #fff6e7 }
+  .bad{  border-color: rgba(239,68,68,.35);  background: #ffecec }
 
   /* Pages / transitions */
   .page{ display:none; opacity:0; transform: translateY(6px); transition: opacity .18s ease, transform .18s ease}
   .page.active{ display:block; opacity:1; transform: translateY(0)}
 
-  footer{ padding:12px 18px; color:var(--muted); font-size:12px; text-align:center; border-top:1px solid rgba(255,255,255,.06)}
+  .cta-row{ display:flex; gap:10px; flex-wrap:wrap }
+  .cta-link{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    background:#fff; border:1px solid var(--border); color:var(--text);
+    padding:12px 14px; border-radius:10px; font-weight:700;
+    transition: transform .06s ease, box-shadow .15s ease, border-color .15s ease;
+  }
+  .cta-link:hover{ border-color:#b9d6ff; box-shadow: 0 4px 12px rgba(59,130,246,.18)}
+  .cta-link .sub{ font-weight:600; color:var(--muted); font-size:12px }
+
+  footer{ padding:12px 18px; color:var(--muted); font-size:12px; text-align:center; border-top:1px solid var(--border); background:#ffffff80; backdrop-filter: blur(4px)}
   .small{ font-size:12px; color:var(--muted) }
 
   @media (max-width: 560px){
@@ -98,14 +122,14 @@
   <main class="app" id="app">
     <header>
       <h1>AI副業 診断テスト</h1>
-      <p>全10問／1問ずつ表示。クリックすると次へ進みます。</p>
+      <p>全10問／1問ずつ表示。クリックすると次へ進みます。（明るく見やすいライト版）</p>
     </header>
 
     <!-- PAGE: Intro -->
     <section class="panel page active" id="page-intro" aria-labelledby="intro-title">
       <div class="intro">
         <h2 id="intro-title">こんな人におすすめ</h2>
-        <p>「長文が読みにくい」「サクッと判定したい」方向けに、回答を短文にしました。20点以上は<strong>AI副業おすすめ</strong>判定になります。</p>
+        <p>「サクッと判定したい」方向けに、短い選択肢でテンポ良く診断。<strong>20点以上は「AI副業おすすめ」</strong>になります。</p>
       </div>
       <div class="card start-wrap">
         <h2>診断を開始</h2>
@@ -134,10 +158,25 @@
         <h2 id="result-title">診断結果</h2>
         <p class="score" id="score"></p>
         <div id="judge" class="badge">判定</div>
+
         <div id="advice" class="card" style="margin-top:6px">
           <h2 style="margin:0 0 6px">ひとことアドバイス</h2>
           <p id="advice-text" style="margin:0; color:var(--muted)"></p>
         </div>
+
+        <!-- 誘導（LINE / note） -->
+        <div class="card" style="margin-top:6px">
+          <h2 style="margin:0 0 6px">次のアクション</h2>
+          <div class="cta-row">
+            <a id="cta-line" class="cta-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="LINEで相談する">
+              💬 LINEで相談する <span class="sub">無料・気軽に質問OK</span>
+            </a>
+            <a id="cta-note" class="cta-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="noteで学ぶ">
+              📝 noteで学ぶ <span class="sub">基礎〜実践を体系化</span>
+            </a>
+          </div>
+        </div>
+
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
           <button class="btn" id="btn-retry">もう一度やる</button>
           <button class="btn secondary" id="btn-share">結果をコピー</button>
@@ -149,6 +188,10 @@
   </main>
 
 <script>
+/* ====== 設定：外部誘導URL（ここを実URLに差し替えてください） ====== */
+const LINE_URL = "https://lin.ee/1EFgSvN";      // ←LINE公式/個別のURLに変更
+const NOTE_URL = "https://note.com/ai_writer_kouza";       // ←noteのプロフィール/講座記事などに変更
+
 /* ====== 短文版 質問セット（各4択：3/2/1/0点） ====== */
 const questions = [
   { title:"目的の明確さ", answers:[
@@ -213,10 +256,9 @@ const questions = [
   ]}
 ];
 
-const app = document.getElementById('app');
-const pageIntro = document.getElementById('page-intro');
+const pageIntro    = document.getElementById('page-intro');
 const pageQuestion = document.getElementById('page-question');
-const pageResult = document.getElementById('page-result');
+const pageResult   = document.getElementById('page-result');
 
 const btnStart = document.getElementById('btn-start');
 const btnReset = document.getElementById('btn-reset');
@@ -233,16 +275,19 @@ const scoreEl = document.getElementById('score');
 const judgeEl = document.getElementById('judge');
 const adviceEl = document.getElementById('advice-text');
 
+const ctaLine = document.getElementById('cta-line');
+const ctaNote = document.getElementById('cta-note');
+
 let state;
 
 function init(){
   state = { idx:0, total:0, answers:[] };
+  ctaLine.href = LINE_URL;
+  ctaNote.href = NOTE_URL;
   showPage('intro');
 }
 function showPage(name){
-  [pageIntro, pageQuestion, pageResult].forEach(p=>{
-    p.classList.remove('active');
-  });
+  [pageIntro, pageQuestion, pageResult].forEach(p=>p.classList.remove('active'));
   if(name==='intro') pageIntro.classList.add('active');
   if(name==='question') pageQuestion.classList.add('active');
   if(name==='result') pageResult.classList.add('active');
@@ -266,10 +311,10 @@ function renderQuestion(){
   qProgressText.textContent = `進捗 ${progress}%`;
 
   answersEl.innerHTML = '';
-  q.answers.forEach((a, idx)=>{
+  q.answers.forEach(a=>{
     const b = document.createElement('button');
     b.className = 'answer';
-    b.setAttribute('type','button');
+    b.type = 'button';
     b.setAttribute('aria-label', `${q.title} - ${a.text}`);
     b.textContent = a.text;
     b.addEventListener('click', ()=>selectAnswer(a.value));
@@ -282,11 +327,9 @@ function selectAnswer(val){
   state.total += val;
   state.idx += 1;
 
-  // ページ切り替え感（小休止なしで即切替）
   if(state.idx < questions.length){
-    renderQuestion(); // 即座に次の“ページ”へ
+    renderQuestion(); // クリックで次へ
   }else{
-    // 最終：100%にしてから結果へ
     bar.style.width = '100%';
     qProgressText.textContent = '進捗 100%';
     renderResult();
@@ -294,35 +337,26 @@ function selectAnswer(val){
 }
 
 function renderResult(){
-  // 20点以上は無条件で「AI副業おすすめ」
   const total = state.answers.reduce((s,v)=> s + (v||0), 0);
   const max = questions.length * 3;
 
   scoreEl.textContent = `合計 ${total} 点（最大 ${max} 点）`;
 
-  let judgeClass='good', judgeText='AI副業おすすめ';
-  let advice = 'まずは小さく受託または発信を始め、テンプレで反復。週次で学習と改善を回しましょう。';
-
-  if(total < 12){
-    judgeClass='bad';
-    judgeText='慎重スタート';
-    advice='生活リズムと基礎ITから整えよう。毎日15分の学習＋週1本のアウトプットを目標に。';
-  }else if(total < 20){
-    judgeClass='warn';
-    judgeText='条件つきでおすすめ';
-    advice='得点の低い項目を1つだけ底上げしよう（例：期限遵守/継続）。週2〜3日の時間確保が鍵。';
+  // ★仕様：20点以上は「AI副業おすすめ」、20点以下は「AI講座でしっかりとAIを勉強しよう！」
+  if(total >= 20){
+    judgeEl.className = 'badge good';
+    judgeEl.textContent = 'AI副業おすすめ';
+    adviceEl.textContent = '得意分野×AIで小さく実践を。テンプレ化→反復で成果を積み上げましょう。';
+  }else{
+    judgeEl.className = 'badge warn';
+    judgeEl.textContent = '学びからスタート';
+    adviceEl.textContent = 'AI講座でしっかりとAIを勉強しよう！基礎→実践の順で、週2〜3日の学習時間を確保すると伸びが早いです。';
   }
-  // 20点以上は常におすすめ（上書きしない）
 
-  judgeEl.className = `badge ${judgeClass}`;
-  judgeEl.textContent = judgeText;
-  adviceEl.textContent = advice;
   showPage('result');
 }
 
-function reset(){
-  init();
-}
+function reset(){ init(); }
 
 function copyShare(){
   const total = state.answers.reduce((s,v)=> s + (v||0), 0);
@@ -334,13 +368,13 @@ function copyShare(){
   }).catch(()=> alert('コピーに失敗しました'));
 }
 
-/* ====== Events ====== */
-btnStart.addEventListener('click', start);
-btnReset.addEventListener('click', reset);
-btnRetry.addEventListener('click', start);
-btnShare.addEventListener('click', copyShare);
+/* Events */
+document.getElementById('btn-start').addEventListener('click', start);
+document.getElementById('btn-reset').addEventListener('click', reset);
+document.getElementById('btn-retry').addEventListener('click', start);
+document.getElementById('btn-share').addEventListener('click', copyShare);
 
-/* 初期化 */
+/* Init */
 init();
 </script>
 </body>
