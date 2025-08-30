@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI副業適性診断アプリ</title>
+    <style>
+        :root {
+            --primary-color: #40e0d0;
+            --primary-dark: #2cb5a8;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --line-color: #00c300;
+            --note-color: #41c9b4;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --bg-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20v20h20zM0 20v20h20c0-11.046-8.954-20-20-20z'/%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .app-title {
+            color: var(--text-light);
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .question-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .question-section.active {
+            display: block;
+        }
+
+        .progress-bar {
+            background: var(--bg-light);
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .question-counter {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .question-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-description {
+            color: #5a6c7d;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .answer-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .answer-btn {
+            padding: 15px 20px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .answer-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(64, 224, 208, 0.05);
+        }
+
+        .answer-btn.selected {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px 40px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 150px;
+        }
+
+        .nav-btn.prev {
+            background: #6c757d;
+            color: white;
+        }
+
+        .nav-btn.next {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .result-header {
+            margin-bottom: 40px;
+        }
+
+        .result-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .result-subtitle {
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='10' cy='10' r='1'/%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: sparkle 10s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .score-number {
+            font-size: 4rem;
+            font-weight: 900;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .recommendation-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .recommendation-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(64, 224, 208, 0.2);
+        }
+
+        .recommendation-card h4 {
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .recommendation-card h4::before {
+            content: '💡';
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .recommendation-list li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.6;
+        }
+
+        .recommendation-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .consultation-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e8f4fd 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .consultation-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .consultation-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .consultation-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .consultation-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .consultation-btn:hover::before {
+            left: 100%;
+        }
+
+        .consultation-btn.line {
+            background: var(--line-color);
+            color: white;
+        }
+
+        .consultation-btn.note {
+            background: var(--note-color);
+            color: white;
+        }
+
+        .consultation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            fill: currentColor;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: var(--text-dark);
+            border: 2px solid var(--border-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .start-section {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .start-description {
+            font-size: 1.2rem;
+            color: #5a6c7d;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 30px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(64, 224, 208, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(64, 224, 208, 0.4);
+        }
+
+        /* モバイル対応 */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .app-header {
+                padding: 30px 20px;
+            }
+            
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .app-subtitle {
+                font-size: 1rem;
+            }
+            
+            .question-section {
+                padding: 20px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .question-title {
+                font-size: 1.2rem;
+            }
+            
+            .answer-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .answer-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .navigation {
+                padding: 0 20px 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                max-width: none;
+                width: 100%;
+            }
+            
+            .result-section {
+                padding: 20px;
+            }
+            
+            .result-title {
+                font-size: 1.6rem;
+            }
+            
+            .score-number {
+                font-size: 3rem;
+            }
+            
+            .recommendation-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .recommendation-card {
+                padding: 20px;
+            }
+            
+            .consultation-buttons {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .consultation-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .action-btn {
+                width: 100%;
+                padding: 12px 20px;
+            }
+            
+            .start-section {
+                padding: 40px 20px;
+            }
+            
+            .start-description {
+                font-size: 1rem;
+            }
+            
+            .start-btn {
+                padding: 15px 30px;
+                font-size: 1.1rem;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-title {
+                font-size: 1.7rem;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .result-emoji {
+                font-size: 3rem;
+            }
+            
+            .score-display {
+                padding: 20px;
+            }
+            
+            .consultation-section {
+                padding: 20px;
+            }
+            
+            .btn-icon {
+                width: 20px;
+                height: 20px;
+                margin-right: 8px;
+            }
+        }
+
+        /* 横向きモバイル対応 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .app-header {
+                padding: 20px;
+            }
+            
+            .app-title {
+                font-size: 1.8rem;
+            }
+            
+            .start-section {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-card">
+            <div class="app-header">
+                <h1 class="app-title">AI副業適性診断</h1>
+                <p class="app-subtitle">10の質問であなたの可能性を発見しよう</p>
+            </div>
+
+            <!-- スタート画面 -->
+            <div id="start-section" class="start-section">
+                <div class="start-description">
+                    AI副業があなたに向いているか、科学的な診断で判定します。<br>
+                    10の質問に答えるだけで、あなたの適性度とおすすめアクションが分かります。<br>
+                    <strong>所要時間：約3分</strong>
+                </div>
+                <button class="start-btn" onclick="startDiagnosis()">診断を開始する</button>
+            </div>
+
+            <!-- 質問セクション -->
+            <div id="question-section" class="question-section">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div id="question-counter" class="question-counter"></div>
+                <div id="question-content" class="question-card"></div>
+            </div>
+            
+            <div id="navigation" class="navigation" style="display: none;">
+                <button id="prev-btn" class="nav-btn prev" onclick="prevQuestion()">前の質問</button>
+                <button id="next-btn" class="nav-btn next" onclick="nextQuestion()" disabled>次の質問</button>
+            </div>
+
+            <!-- 結果セクション -->
+            <div id="result-section" class="result-section">
+                <div class="result-header">
+                    <div id="result-emoji" class="result-emoji"></div>
+                    <h2 id="result-title" class="result-title"></h2>
+                    <p id="result-subtitle" class="result-subtitle"></p>
+                </div>
+
+                <div class="score-display">
+                    <div id="score-number" class="score-number"></div>
+                    <div class="score-label">AI副業おすすめ度</div>
+                </div>
+
+                <div id="recommendations" class="recommendation-grid"></div>
+
+                <!-- AI副業相談セクション -->
+                <div class="consultation-section">
+                    <h3 class="consultation-title">🤝 AI副業について相談する</h3>
+                    <div class="consultation-buttons">
+                        <a href="https://lin.ee/1EFgSvN" target="_blank" class="consultation-btn line">
+                            <svg class="btn-icon" viewBox="0 0 24 24">
+                                <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                            </svg>
+                            LINEで相談する
+                        </a>
+                        <a href="https://note.com/ai_writer_kouza" target="_blank" class="consultation-btn note">
+                            <svg class="btn-icon" viewBox="0 0 24 24">
+                                <path d="M8.33 12.91c.93.93 2.31.93 3.23 0 .93-.93.93-2.31 0-3.24-.46-.46-1.08-.7-1.62-.7-.53 0-1.15.24-1.61.7-.93.93-.93 2.31 0 3.24zm7.36-7.36c.93.93 2.31.93 3.23 0 .93-.93.93-2.31 0-3.24-.46-.46-1.08-.7-1.62-.7-.53 0-1.15.24-1.61.7-.93.93-.93 2.31 0 3.24zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 21.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 2.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.55-1.69 4.9z"/>
+                            </svg>
+                            noteでAI副業を学ぶ
+                        </a>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn secondary" onclick="restartDiagnosis()">もう一度診断する</button>
+                    <button class="action-btn primary" onclick="shareResult()">結果をシェア</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                title: "新しいことへの挑戦について",
+                description: "新しい技術やツールに対するあなたのスタンスはどれですか？",
+                answers: [
+                    { text: "まず試してみて、使いながら覚える", value: 3 },
+                    { text: "少し調べてから慎重に始める", value: 2 },
+                    { text: "完全に理解してから使い始めたい", value: 1 },
+                    { text: "新しいものは避けたい", value: 0 }
+                ]
+            },
+            {
+                title: "パソコンスキルについて",
+                description: "普段のパソコン作業に対するあなたの状況は？",
+                answers: [
+                    { text: "複数のアプリを使いこなせる", value: 3 },
+                    { text: "基本的な操作は問題なくできる", value: 2 },
+                    { text: "簡単な作業なら何とかできる", value: 1 },
+                    { text: "パソコン作業は苦手", value: 0 }
+                ]
+            },
+            {
+                title: "AIツールの使用経験",
+                description: "ChatGPTなどのAIツールをどの程度使っていますか？",
+                answers: [
+                    { text: "日常的に業務で活用している", value: 3 },
+                    { text: "時々使って便利さを実感している", value: 2 },
+                    { text: "試したことはあるが頻繁ではない", value: 1 },
+                    { text: "使ったことがない", value: 0 }
+                ]
+            },
+            {
+                title: "継続学習について",
+                description: "新しい知識やスキルの習得に対するあなたの姿勢は？",
+                answers: [
+                    { text: "常に新しいことを学ぶのが楽しい", value: 3 },
+                    { text: "必要に応じて学習する", value: 2 },
+                    { text: "たまに興味のあることを学ぶ", value: 1 },
+                    { text: "学習するのは面倒", value: 0 }
+                ]
+            },
+            {
+                title: "マーケティング・発信経験",
+                description: "SNSやブログでの情報発信経験はありますか？",
+                answers: [
+                    { text: "積極的に発信し、反応も分析している", value: 3 },
+                    { text: "時々発信している", value: 2 },
+                    { text: "たまに投稿する程度", value: 1 },
+                    { text: "ほとんど発信したことがない", value: 0 }
+                ]
+            },
+            {
+                title: "Web・IT分野での経験",
+                description: "Web関連の実務経験はどの程度ありますか？",
+                answers: [
+                    { text: "プログラミングやWebデザインの経験あり", value: 3 },
+                    { text: "WebライティングやSNS運用の経験あり", value: 2 },
+                    { text: "簡単なHP作成やブログ運営の経験あり", value: 1 },
+                    { text: "Web関連の経験はほとんどない", value: 0 }
+                ]
+            },
+            {
+                title: "業務効率化への関心",
+                description: "作業の効率化について、どう考えていますか？",
+                answers: [
+                    { text: "常に最適化を考え、新ツールを試している", value: 3 },
+                    { text: "効率化は意識しているが、たまに取り組む", value: 2 },
+                    { text: "必要に迫られたら効率化を考える", value: 1 },
+                    { text: "今のやり方で十分だと思う", value: 0 }
+                ]
+            },
+            {
+                title: "変化への適応力",
+                description: "環境の変化や新しい状況に対してどう感じますか？",
+                answers: [
+                    { text: "変化を楽しみ、積極的に適応する", value: 3 },
+                    { text: "変化に対してポジティブに対応する", value: 2 },
+                    { text: "変化には時間をかけて慣れる", value: 1 },
+                    { text: "変化は避けたいと思う", value: 0 }
+                ]
+            },
+            {
+                title: "責任感・ビジネスマナー",
+                description: "仕事に対する責任感やマナーについて",
+                answers: [
+                    { text: "常に期限を守り、丁寧なコミュニケーションを心がけている", value: 3 },
+                    { text: "基本的なマナーは守れている", value: 2 },
+                    { text: "時々うっかりすることはあるが、基本は大丈夫", value: 1 },
+                     { text: "期限をいつも守れない", value: 0 }
+                ]
+            },
+            {
+{ text: "マナーや期限管理が苦手", value: 0 }
+               ]
+           },
+           {
+               title: "継続力・習慣化",
+               description: "物事を継続することについて",
+               answers: [
+                   { text: "小さなことでもコツコツ続けるのが得意", value: 3 },
+                   { text: "興味があることなら継続できる", value: 2 },
+                   { text: "時々三日坊主になるが、やり直せる", value: 1 },
+                   { text: "継続するのが苦手", value: 0 }
+               ]
+           }
+       ];
+
+       let currentQuestion = 0;
+       let answers = [];
+       let totalScore = 0;
+
+       function startDiagnosis() {
+           document.getElementById('start-section').style.display = 'none';
+           document.getElementById('question-section').classList.add('active');
+           document.getElementById('navigation').style.display = 'flex';
+           showQuestion();
+       }
+
+       function showQuestion() {
+           const question = questions[currentQuestion];
+           const questionContent = document.getElementById('question-content');
+           const questionCounter = document.getElementById('question-counter');
+           const progressFill = document.getElementById('progress-fill');
+           
+           questionCounter.textContent = `質問 ${currentQuestion + 1} / ${questions.length}`;
+           progressFill.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+           
+           questionContent.innerHTML = `
+               <h3 class="question-title">${question.title}</h3>
+               <p class="question-description">${question.description}</p>
+               <div class="answer-buttons" id="answer-buttons">
+                   ${question.answers.map((answer, index) => 
+                       `<button class="answer-btn" onclick="selectAnswer(${index})" data-value="${answer.value}">
+                           ${answer.text}
+                       </button>`
+                   ).join('')}
+               </div>
+           `;
+           
+           // 前回の回答があれば選択状態を復元
+           if (answers[currentQuestion] !== undefined) {
+               const buttons = document.querySelectorAll('.answer-btn');
+               buttons[answers[currentQuestion].index].classList.add('selected');
+               document.getElementById('next-btn').disabled = false;
+           } else {
+               document.getElementById('next-btn').disabled = true;
+           }
+           
+           document.getElementById('prev-btn').disabled = currentQuestion === 0;
+           
+           // 最後の質問の場合、「結果を見る」に変更
+           const nextBtn = document.getElementById('next-btn');
+           if (currentQuestion === questions.length - 1) {
+               nextBtn.textContent = '結果を見る';
+           } else {
+               nextBtn.textContent = '次の質問';
+           }
+       }
+
+       function selectAnswer(answerIndex) {
+           const buttons = document.querySelectorAll('.answer-btn');
+           buttons.forEach(btn => btn.classList.remove('selected'));
+           buttons[answerIndex].classList.add('selected');
+           
+           const answerValue = parseInt(buttons[answerIndex].dataset.value);
+           answers[currentQuestion] = {
+               index: answerIndex,
+               value: answerValue
+           };
+           
+           document.getElementById('next-btn').disabled = false;
+       }
+
+       function nextQuestion() {
+           if (currentQuestion < questions.length - 1) {
+               currentQuestion++;
+               showQuestion();
+           } else {
+               showResult();
+           }
+       }
+
+       function prevQuestion() {
+           if (currentQuestion > 0) {
+               currentQuestion--;
+               showQuestion();
+           }
+       }
+
+       function showResult() {
+           // スコア計算
+           totalScore = answers.reduce((sum, answer) => sum + answer.value, 0);
+           const maxScore = questions.length * 3;
+           const percentage = Math.round((totalScore / maxScore) * 100);
+           
+           document.getElementById('question-section').classList.remove('active');
+           document.getElementById('navigation').style.display = 'none';
+           document.getElementById('result-section').classList.add('show');
+           
+           const resultData = getResultData(percentage);
+           
+           document.getElementById('result-emoji').textContent = resultData.emoji;
+           document.getElementById('result-title').textContent = resultData.title;
+           document.getElementById('result-subtitle').textContent = resultData.subtitle;
+           document.getElementById('score-number').textContent = `${percentage}%`;
+           
+           // おすすめアクションの表示
+           const recommendationsContainer = document.getElementById('recommendations');
+           recommendationsContainer.innerHTML = resultData.recommendations.map(rec => `
+               <div class="recommendation-card">
+                   <h4>${rec.title}</h4>
+                   <ul class="recommendation-list">
+                       ${rec.items.map(item => `<li>${item}</li>`).join('')}
+                   </ul>
+               </div>
+           `).join('');
+       }
+
+       function getResultData(percentage) {
+           if (percentage >= 80) {
+               return {
+                   emoji: "🚀",
+                   title: "AI副業に非常に向いています！",
+                   subtitle: "今すぐ行動を開始することをおすすめします",
+                   recommendations: [
+                       {
+                           title: "即戦力アクション",
+                           items: [
+                               "AI副業案件に積極的に応募する",
+                               "既存スキルとAIを組み合わせたサービス開発",
+                               "業界の最新トレンドを継続学習する",
+                               "専門性を高めて差別化を図る"
+                           ]
+                       },
+                       {
+                           title: "収益化戦略",
+                           items: [
+                               "高単価案件を狙える専門分野を特定",
+                               "実績を積み上げてポートフォリオ構築",
+                               "クライアントとの長期関係を構築",
+                               "独自のAI活用ノウハウを商品化"
+                           ]
+                       }
+                   ]
+               };
+           } else if (percentage >= 60) {
+               return {
+                   emoji: "⭐",
+                   title: "AI副業の可能性があります",
+                   subtitle: "スキルアップで成功の可能性が高まります",
+                   recommendations: [
+                       {
+                           title: "スキルアップ重点項目",
+                           items: [
+                               "AIツールの基本操作をマスター",
+                               "小規模なプロジェクトで経験を積む",
+                               "継続学習の習慣を確立する",
+                               "得意分野を見つけて特化する"
+                           ]
+                       },
+                       {
+                           title: "段階的アプローチ",
+                           items: [
+                               "まずは副業レベルから開始",
+                               "実績を作りながらスキル向上",
+                               "ネットワーキングで情報収集",
+                               "長期的な成長戦略を立てる"
+                           ]
+                       }
+                   ]
+               };
+           } else {
+               return {
+                   emoji: "🤔",
+                   title: "他の選択肢も検討してみては？",
+                   subtitle: "あなたの既存スキルを活かせる道もあります",
+                   recommendations: [
+                       {
+                           title: "代替案の検討",
+                           items: [
+                               "リアルスキル（料理、ハンドメイドなど）の活用",
+                               "対面サービスでの副業を検討",
+                               "まずはPCスキルの基礎を習得",
+                               "AI副業は将来的な選択肢として温存"
+                           ]
+                       },
+                       {
+                           title: "基礎固めのステップ",
+                           items: [
+                               "パソコン操作の基本をマスター",
+                               "AIツールに少しずつ慣れる",
+                               "オンライン学習で知識を補強",
+                               "小さな成功体験を積み重ねる"
+                           ]
+                       }
+                   ]
+               };
+           }
+       }
+
+       function restartDiagnosis() {
+           currentQuestion = 0;
+           answers = [];
+           totalScore = 0;
+           document.getElementById('result-section').classList.remove('show');
+           document.getElementById('navigation').style.display = 'none';
+           document.getElementById('start-section').style.display = 'block';
+       }
+
+       function shareResult() {
+           const percentage = Math.round((totalScore / (questions.length * 3)) * 100);
+           const shareText = `AI副業適性診断の結果: ${percentage}%でした！あなたも診断してみませんか？`;
+           
+           if (navigator.share) {
+               navigator.share({
+                   title: 'AI副業適性診断',
+                   text: shareText,
+                   url: window.location.href
+               }).catch(err => {
+                   console.log('シェアがキャンセルされました');
+               });
+           } else {
+               // フォールバック: クリップボードにコピー
+               navigator.clipboard.writeText(shareText + ' ' + window.location.href).then(() => {
+                   alert('結果をクリップボードにコピーしました！');
+               }).catch(err => {
+                   console.error('コピーに失敗しました:', err);
+               });
+           }
+       }
+   </script>
+</body>
+</html>
